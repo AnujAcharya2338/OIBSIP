@@ -12,6 +12,10 @@ root.title("Weather App")
 root.geometry("1000x700+200+100")
 root.config(padx=20, pady=20, bg=THEME_COLOR)
 
+forecast_data = None
+temp = None
+is_fahrenheit = False
+
 main_frame = tk.Frame(root, bg=THEME_COLOR)
 main_frame.pack(pady=20)
 
@@ -45,10 +49,7 @@ hourly_frame = tk.Frame(root, bg=THEME_COLOR)
 daily_title = tk.Label(root, text="Next 5 days", fg="white", bg=THEME_COLOR, font=("Arial", 12, "bold"))
 daily_frame = tk.Frame(root, bg=THEME_COLOR)
 
-# hourly_title.place_forget()
-# hourly_frame.place_forget()
-# daily_title.place_forget()
-# daily_frame.place_forget()
+
 
 hourly_icon_refs = []
 daily_icon_refs = []
@@ -58,6 +59,8 @@ def clear_weather():
     result1.config(text="")
     result2.config(text="")
     result3.config(text="")
+    hourly_title.config(text="")
+    daily_title.config(text="")
     icon_label.config(image="")
     icon_label.image = None
     for widget in hourly_frame.winfo_children():
@@ -70,6 +73,7 @@ def clear_weather():
     hourly_frame.place_forget()
     daily_title.place_forget()
     daily_frame.place_forget()
+    temperature_button.grid_remove()
      
 def get_icon_image(icon_code):
     try:
@@ -126,21 +130,33 @@ def handle_response(response):
     return None, f"Unexpected error occurred. {response.status_code}"
 
 def display_weather(checked_city):
+    global temp
     temp = round(checked_city["main"]["temp"])
     faran = round((temp * 9 / 5) + 32, 3)
     hum = checked_city["main"]["humidity"]
     wind_speed = checked_city["wind"]["speed"]
     icon_code = checked_city["weather"][0]["icon"]
+    description = (checked_city["weather"][0]["description"])
     
-    icon = get_icon_image(icon_code)
-    if icon:
-        icon_label.config(image=icon)
-        icon_label.image = icon
-
-    result.config(text=f"Temperature: {temp}°C")
-    result1.config(text=f"Fahrenheit: {faran}°F")
+   
+    update_temperature()
+    result1.config(text=f"Description: {description}")
     result2.config(text=f"Humidity: {hum}%")
     result3.config(text=f"Wind: {wind_speed} m/s")
+
+def update_temperature():
+    if is_fahrenheit:
+        temperature = round((temp * 9 / 5) + 32, 1)
+        result.config(text=f"Temperature: {temperature}°F")
+    else:
+        temperature = round(temp, 1)
+        result.config(text=f"Temperature: {temperature}°C")
+
+def toggle_temperature():
+    global is_fahrenheit
+
+    is_fahrenheit = not is_fahrenheit
+    update_temperature()
     
 def display_hourly(forecast_data):
     hourly_title.pack(pady=(10, 5))
@@ -212,12 +228,16 @@ def search():
         result.config(text=error)
         return
     display_weather(weather_data)
+    temperature_button.grid(row=1,column=1,padx=5,pady=10)
+    
 
     forecast_data, forecast_error = handle_response(get_forecast(city))
     if forecast_error:
         return  
     display_hourly(forecast_data)
     display_daily(forecast_data)
+
+temperature_button = tk.Button(main_frame,text="°C / °F",command=toggle_temperature)
 
 
 button = tk.Button(main_frame,text="Search",command=search)
