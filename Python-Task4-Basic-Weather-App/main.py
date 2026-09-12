@@ -13,8 +13,7 @@ root.geometry("1000x700+200+100")
 root.config(padx=20, pady=20, bg=THEME_COLOR)
 
 main_frame = tk.Frame(root, bg=THEME_COLOR)
-main_frame.place(relx=0.5, rely=0.15, anchor="center")
-
+main_frame.pack(pady=20)
 
 question = tk.Label(main_frame,text="Enter the name of the city:",fg="white",bg=THEME_COLOR)
 question.grid(row=0, column=0, padx=5, pady=5)
@@ -23,7 +22,7 @@ city_entry = tk.Entry(main_frame)
 city_entry.grid(row=0, column=1, padx=5, pady=5)
 
 result_frame = tk.Frame(root, bg=THEME_COLOR)
-result_frame.place(relx=0.5, rely=0.35, anchor="center")
+result_frame.pack(pady=(10,5))
 
 result = tk.Label(result_frame,text="",fg="white",bg=THEME_COLOR)
 result.grid(row=0, column=0, padx=10)
@@ -38,24 +37,18 @@ result3 = tk.Label(result_frame,text="",fg="white",bg=THEME_COLOR)
 result3.grid(row=0, column=3, padx=10)
 
 icon_label = tk.Label(root, bg=THEME_COLOR)
-icon_label.place(relx=0.5, rely=0.3, anchor="center")
+icon_label.pack(pady=(10,5))
 
 hourly_title = tk.Label(root, text="Next hours", fg="white", bg=THEME_COLOR, font=("Arial", 12, "bold"))
-hourly_title.place(relx=0.5, rely=0.44, anchor="center")
-
 hourly_frame = tk.Frame(root, bg=THEME_COLOR)
-hourly_frame.place(relx=0.5, rely=0.54, anchor="center")
 
 daily_title = tk.Label(root, text="Next 5 days", fg="white", bg=THEME_COLOR, font=("Arial", 12, "bold"))
-daily_title.place(relx=0.5, rely=0.7, anchor="center")
-
 daily_frame = tk.Frame(root, bg=THEME_COLOR)
-daily_frame.place(relx=0.5, rely=0.82, anchor="center")
 
-hourly_title.place_forget()
-hourly_frame.place_forget()
-daily_title.place_forget()
-daily_frame.place_forget()
+# hourly_title.place_forget()
+# hourly_frame.place_forget()
+# daily_title.place_forget()
+# daily_frame.place_forget()
 
 hourly_icon_refs = []
 daily_icon_refs = []
@@ -150,8 +143,8 @@ def display_weather(checked_city):
     result3.config(text=f"Wind: {wind_speed} m/s")
     
 def display_hourly(forecast_data):
-    hourly_title.place(relx=0.5, rely=0.44, anchor="center")
-    hourly_frame.place(relx=0.5, rely=0.54, anchor="center")
+    hourly_title.pack(pady=(10, 5))
+    hourly_frame.pack(pady=(0, 15))
     
     entries = forecast_data["list"][:6] 
     for i, entry in enumerate(entries):
@@ -175,8 +168,8 @@ def display_hourly(forecast_data):
         tk.Label(col_frame, text=f"{temp}°C", fg="white", bg=THEME_COLOR).pack()
      
 def display_daily(forecast_data):
-    daily_title.place(relx=0.5, rely=0.7, anchor="center")
-    daily_frame.place(relx=0.5, rely=0.82, anchor="center")
+    daily_title.pack(pady=(10, 5))
+    daily_frame.pack(pady=(0, 15))
     entries = forecast_data["list"]
     daily_by_date = {}
     for entry in entries:
