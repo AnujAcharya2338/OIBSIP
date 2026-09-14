@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head><title>Chat Room</title></head>
+<body>
+    <div id="chat-log"></div>
+    <input id="chat-message-input" type="text">
+    <button id="chat-message-submit">Send</button>
+
+
+    {{ room_name|json_script:"room-name" }}
+    
+    <script>
+        const emojiMap = {
+    ":smile:": "😄",
+    ":laughing:": "😆",
+    ":heart:": "❤️",
+    ":thumbsup:": "👍",
+    ":thumbsdown:": "👎",
+    ":fire:": "🔥",
+    ":cry:": "😢",
+    ":wave:": "👋",
+    ":thinking:": "🤔",
+    ":tada:": "🎉"
+};
+
+function renderEmoji(text) {
+    return text.replace(/:[a-z_]+:/g, function(match) {
+        return emojiMap[match] || match;
+    });
+}
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    if (data.system) {
+        document.querySelector('#chat-log').innerHTML +=
+            '<i>' + renderEmoji(data.message) + '</i><br>';
+    } else {
+        document.querySelector('#chat-log').innerHTML +=
+            '[' + data.timestamp + '] ' + data.username + ': ' + renderEmoji(data.message) + '<br>';
+
+        if (document.hidden && Notification.permission === "granted") {
+            new Notification(data.username + " says:", {
+                body: data.message
+            });
+        }
+    }
+};
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+    Notification.requestPermission();
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<h2>Chat Rooms</h2>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="room_name" placeholder="Room name">
+    <button type="submit">Join / Create</button>
+</form>
+
+<ul>
+    {% for room in rooms %}
+        <li><a href="{% url 'room' room.name %}">{{ room.name }}</a></li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'logout' %}">Logout</a>
